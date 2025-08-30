@@ -1,0 +1,40 @@
+name: OpenSCAD Build
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache Dependencies
+      id: cache-dependencies
+      uses: actions/cache@v4
+      with:
+        path: libraries
+        key: ${{ hashFiles('**/dependencies.txt') }}-deps
+
+    - name: Install packages
+      run: |
+        sudo apt update && \
+          sudo apt install -y \
+            openscad \
+            git
+ 
+    - name: Run OpenSCAD build
+      run: ./openscab
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: openscad-build-${{ github.sha }}
+        path: out/
+        retention-days: 30
+        if-no-files-found: warn
