@@ -63,6 +63,18 @@ else
             FAIL_COUNT=$((FAIL_COUNT + 1))
             FAILURE_MESSAGES+=("Failed to generate $fullname from $f:"$'\n'"$formatted_result"$'\n')
         fi
+
+        fullname="$name.stl"
+        result=$(OPENSCADPATH=libraries openscad --hardwarnings -o "stl/$fullname" "$f" 2>&1)
+        exitCode=$?
+        formatted_result=$(echo "$result" | sed 's/^/    /')
+        if [ $exitCode -eq 0 ]; then
+            SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+            MESSAGES+=("Successfully generated stl/$fullname from $f:"$'\n'"$formatted_result"$'\n')
+        else
+            FAIL_COUNT=$((FAIL_COUNT + 1))
+            FAILURE_MESSAGES+=("Failed to generate $fullname from $f:"$'\n'"$formatted_result"$'\n')
+        fi
     done
 
     echo "-------------------------------"
